@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./tailor.js"></script>
+    <style>
+        html,body {
+            height: 100%;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            position: relative;
+        }
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        #box {
+            width: 800px;
+            height: 600px;
+            margin: 100px 0px 0px 160px;
+        }
+        
+        #btn {
+            position: absolute;
+            left: 10px;
+            top: 400px;
+            width: 80px;
+            height: 40px;
+        }
+        .select-img{
+            position: absolute;
+            left: 10px;
+            top: 100px;
+            width: 80px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            color: rgb(12, 150, 204);
+            border: 1px solid #ddd;
+        }
+
+        #input {
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+        #lock {
+            height: 40px;
+            line-height: 40px;
+            position: absolute;
+            top: 160px;
+            left: 10px;
+            padding: 0px 10px;
+        }
+        .part {
+            position: absolute;
+            height: 40px;
+            left: 10px;
+            top: 220px;
+        }
+        .end {
+            top: 260px;
+        }
+        #x,#y {
+            height: 30px;
+            line-height: 30px;
+            width: 80px;
+            padding-left: 10px;
+        }
+
+        #set {
+            position: absolute;
+            left: 10px;
+            top: 320px;
+            height: 40px;
+            padding: 0px 10px;
+        }
+        .lockP {
+            position: absolute;
+            left: 10px;
+            top: 370px;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="select-img">
+        <input type="file" accept="image/*" id="input">
+        <span>选择图片</span>
+    </div>
+    <button id="lock">开启裁剪框比例</button>
+    <div class="part">
+        <span>x:</span>
+        <input type="number" id="x" disabled value="4">
+    </div>
+
+    <div class="lockP">
+        <label><input type="radio" name="sex" value="x" id="lockx" checked disabled>锁定X轴</label>
+        <label><input type="radio" name="sex" value="y" id="locky" disabled>锁定Y轴</label>
+    </div>
+
+    <div class="part end">
+        <span>y:</span>
+        <input type="number" id="y" disabled value="3">
+    </div>
+    <button id="set" disabled>设置裁剪框比例</button>
+
+    <button id="btn">裁剪图片</button>
+    <div id="box"></div>
+</body>
+</html>
+
+<script>
+    var box = document.getElementById('box');
+    var input = document.getElementById('input');
+    var btn = document.getElementById('btn');
+    var x = document.getElementById('x');
+    var y = document.getElementById('y');
+    var set = document.getElementById('set');
+    var lock = document.getElementById('lock');
+    var lockx = document.getElementById('lockx');
+    var locky = document.getElementById('locky');
+    var tailor = new Tailor({
+        el:box,
+    });
+
+    lock.addEventListener('click',function(e){
+        if(set.disabled){
+            set.disabled = false;
+            x.disabled = false;
+            y.disabled = false;
+            lockx.disabled = false;
+            locky.disabled = false;
+            setting()
+            lock.innerText = '关闭裁剪框比例'
+        }else{
+            set.disabled = true;
+            x.disabled = true;
+            y.disabled = true;
+            lockx.disabled = true;
+            locky.disabled = true;
+            tailor.init({
+                lockScale:null,
+            })
+            lock.innerText = '开启裁剪框比例'
+        }
+    })
+
+    set.addEventListener('click',function(){
+        setting()
+    })
+    function setting(){
+        tailor.init({
+            lockScale:{x:x.value*1,y:y.value*1},
+            lockX:lockx.checked,
+            lockY:locky.checked
+        })
+    }
+    input.addEventListener('change',function(e){
+        // console.log(e.target.files[0])
+        tailor.init({
+            img:e.target.files[0],
+        })
+    })
+
+    lockx.addEventListener('change',function(e){
+        setting()
+    })
+
+    locky.addEventListener('change',function(e){
+        setting()
+    })
+
+    btn.addEventListener('click',function(e){
+        var file = tailor.getTailorImg();
+        if(file){
+            var url = window.URL.createObjectURL();
+            window.open(url);
+        }
+        // window.open(tailor.getTailorBase64Img());
+    })
+</script>
